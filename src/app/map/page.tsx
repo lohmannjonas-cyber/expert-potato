@@ -1,5 +1,6 @@
 import { getAllSpots } from "@/lib/rankings";
 import { SpotMap } from "@/components/SpotMap";
+import { regionLabel } from "@/lib/i18n";
 
 export default async function MapPage() {
   const spots = await getAllSpots();
@@ -18,7 +19,7 @@ export default async function MapPage() {
           {spots.map((spot) => (
             <a key={spot.id} href={`/spots/${spot.slug}`} className="block rounded-lg border border-slate-200 bg-white p-4 shadow-soft hover:border-lagoon">
               <h2 className="font-black text-slate-950">{spot.name}</h2>
-              <p className="mt-1 text-sm font-semibold text-slate-600">{spot.region}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{regionLabel(spot.region, "de")}</p>
               <p className="mt-2 text-sm text-slate-700">Good: {spot.suitableWindDirections.join(", ")}</p>
             </a>
           ))}

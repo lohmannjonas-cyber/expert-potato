@@ -54,6 +54,7 @@ export type RatingPreferences = {
   waveOnly?: boolean;
   dateType?: "ANY" | "WEEKDAY" | "WEEKEND";
   scoringWeights?: Partial<Record<"direction" | "strength" | "gusts" | "consistency" | "comfort" | "profile", number>>;
+  language?: "de" | "en";
 };
 
 export type SpotRatingResult = {
@@ -115,6 +116,48 @@ function describeWindStrength(wind: number, min: number, max: number) {
   if (wind <= max) return "ideal";
   if (wind <= max + 5) return "strong";
   return "too strong";
+}
+
+function translateDirectionQuality(quality: string, language: "de" | "en") {
+  if (language === "en") return quality;
+  const translations: Record<string, string> = {
+    "awkward angle": "ungunstiger Winkel",
+    offshore: "Offshore-Wind",
+    "near-offshore": "fast offshore",
+    "excellent side-shore or side-onshore angle": "sehr guter Side- bis Side-Onshore-Winkel",
+    "good angle": "guter Winkel",
+    "usable but not clean": "fahrbar, aber nicht ideal"
+  };
+  return translations[quality] ?? quality;
+}
+
+function translateStrengthQuality(quality: string, language: "de" | "en") {
+  if (language === "en") return quality;
+  const translations: Record<string, string> = {
+    "marginal wind": "grenzwertiger Wind",
+    "strong wind": "starker Wind",
+    "ideal wind": "idealer Wind"
+  };
+  return translations[quality] ?? quality;
+}
+
+function translateWarning(warning: string, language: "de" | "en") {
+  if (language === "en") return warning;
+  const translations: Record<string, string> = {
+    "Offshore wind warning": "Offshore-Warnung",
+    "Near-offshore wind angle": "Fast offshore",
+    "Below most usable kite wind ranges": "Unterhalb vieler nutzbarer Kite-Windbereiche",
+    "Storm-strength wind warning": "Starkwind- oder Sturmwarnung",
+    "Very gusty wind warning": "Sehr boeiger Wind",
+    "Gusty wind warning": "Boeiger Wind",
+    "Rain risk": "Regenrisiko",
+    "Cold water and air warning": "Kalte Luft und kaltes Wasser",
+    "Cold session warning": "Kalte Session",
+    "Outside practical daylight window": "Ausserhalb eines sinnvollen Tageslichtfensters",
+    "Spot marked restricted by admin": "Spot ist vom Admin als eingeschraenkt markiert"
+  };
+  if (warning.startsWith("Season note:")) return warning.replace("Season note:", "Saisonhinweis:");
+  return translations[warning] ?? warning;
 }
 
 function weights(preferences: RatingPreferences) {
@@ -326,6 +369,7 @@ export function rateSpotForDate(
   date: Date,
   preferences: RatingPreferences = {}
 ): SpotRatingResult | null {
+  const language = preferences.language ?? "de";
   if (preferences.dateType === "WEEKEND" && !isWeekendDate(date)) return null;
   if (preferences.dateType === "WEEKDAY" && isWeekendDate(date)) return null;
 
@@ -346,20 +390,40 @@ export function rateSpotForDate(
   const best = rankedWindows[0];
   const first = best.window[0].hour.forecastTime;
   const last = best.window[best.window.length - 1].hour.forecastTime;
-  const windDirectionQuality = [...best.window].sort((a, b) => b.directionScore - a.directionScore)[0].directionQuality;
-  const windStrengthQuality = best.summary.averageWind < spot.idealMinWindKnots ? "marginal wind" : best.summary.averageWind > spot.idealMaxWindKnots ? "strong wind" : "ideal wind";
-  const rainText = best.summary.totalRain < 0.5 ? "low rain risk" : `${best.summary.totalRain.toFixed(1)} mm rain risk`;
+  const rawWindDirectionQuality = [...best.window].sort((a, b) => b.directionScore - a.directionScore)[0].directionQuality;
+  const rawWindStrengthQuality = best.summary.averageWind < spot.idealMinWindKnots ? "marginal wind" : best.summary.averageWind > spot.idealMaxWindKnots ? "strong wind" : "ideal wind";
+  const windDirectionQuality = translateDirectionQuality(rawWindDirectionQuality, language);
+  const windStrengthQuality = translateStrengthQuality(rawWindStrengthQuality, language);
+  const rainText =
+    best.summary.totalRain < 0.5
+      ? language === "de"
+        ? "geringes Regenrisiko"
+        : "low rain risk"
+      : language === "de"
+        ? `${best.summary.totalRain.toFixed(1)} mm Regenrisiko`
+        : `${best.summary.totalRain.toFixed(1)} mm rain risk`;
   const gustText =
-    best.summary.maxGust / Math.max(best.summary.averageWind, 1) > 1.45 ? "gusts need caution" : "moderate gusts";
+    best.summary.maxGust / Math.max(best.summary.averageWind, 1) > 1.45
+      ? language === "de"
+        ? "Boeen brauchen Vorsicht"
+        : "gusts need caution"
+      : language === "de"
+        ? "moderate Boeen"
+        : "moderate gusts";
 
   const riskWarnings = [...best.summary.warnings];
   if (spot.restricted) riskWarnings.push("Spot marked restricted by admin");
   if (spot.seasonRestrictions) riskWarnings.push(`Season note: ${spot.seasonRestrictions}`);
 
   const bestTimeWindow = `${displayHour(first)}-${displayHour(last)}`;
-  const explanation = `${spot.name} - ${best.summary.score}/100. Best window ${bestTimeWindow}. Wind ${best.summary.dominantDirection} ${Math.round(
-    best.summary.minWind
-  )}-${Math.round(best.summary.maxWind)} knots, ${windDirectionQuality}, ${gustText}, ${rainText}.`;
+  const explanation =
+    language === "de"
+      ? `${spot.name} - ${best.summary.score}/100. Bestes Fenster ${bestTimeWindow}. Wind ${best.summary.dominantDirection} ${Math.round(
+          best.summary.minWind
+        )}-${Math.round(best.summary.maxWind)} Knoten, ${windDirectionQuality}, ${gustText}, ${rainText}.`
+      : `${spot.name} - ${best.summary.score}/100. Best window ${bestTimeWindow}. Wind ${best.summary.dominantDirection} ${Math.round(
+          best.summary.minWind
+        )}-${Math.round(best.summary.maxWind)} knots, ${windDirectionQuality}, ${gustText}, ${rainText}.`;
 
   return {
     spot,
@@ -367,7 +431,7 @@ export function rateSpotForDate(
     explanation,
     windDirectionQuality,
     windStrengthQuality,
-    riskWarnings: Array.from(new Set(riskWarnings)),
+    riskWarnings: Array.from(new Set(riskWarnings.map((warning) => translateWarning(warning, language)))),
     bestTimeWindow,
     beginnerWarning: best.summary.beginnerWarning,
     windowStart: first,

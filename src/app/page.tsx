@@ -10,11 +10,13 @@ import { dictionary, getLocale } from "@/lib/i18n";
 function RankingColumn({
   title,
   subtitle,
-  ratings
+  ratings,
+  locale
 }: {
   title: string;
   subtitle: string;
   ratings: NonNullable<Awaited<ReturnType<typeof getDashboardData>>["tomorrow"][number]>[];
+  locale: "de" | "en";
 }) {
   return (
     <section className="rounded-lg border border-slate-200 bg-white/70 p-4 shadow-soft">
@@ -24,7 +26,7 @@ function RankingColumn({
       </div>
       <div className="space-y-4">
         {ratings.slice(0, 3).map((rating, index) => (
-          <RatingCard key={`${rating.spot.id}-${rating.windowStart.toISOString()}`} rating={rating} rank={index + 1} />
+          <RatingCard key={`${rating.spot.id}-${rating.windowStart.toISOString()}`} rating={rating} rank={index + 1} locale={locale} />
         ))}
       </div>
     </section>
@@ -35,7 +37,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
   const params = await searchParams;
   const locale = getLocale(params.lang);
   const t = dictionary[locale].home;
-  const filters = parseRankingFilters(params, { avoidOffshoreWind: true });
+  const filters = { ...parseRankingFilters(params, { avoidOffshoreWind: true }), language: locale };
   const queryString = queryStringFromParams(params);
   const rankingsHref = queryString ? `/rankings?${queryString}` : "/rankings";
   const activeFilters = activeFilterLabels(filters);
@@ -124,9 +126,9 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
       </section>
 
       <section className="mx-auto grid max-w-7xl gap-5 px-4 pb-10 sm:px-6 xl:grid-cols-3 lg:px-8">
-        <RankingColumn title={t.weekendTitle} subtitle={t.weekendSubtitle} ratings={data.weekend} />
-        <RankingColumn title={t.tomorrowTitle} subtitle={t.tomorrowSubtitle} ratings={data.tomorrow} />
-        <RankingColumn title={t.weekdayTitle} subtitle={t.weekdaySubtitle} ratings={data.weekday} />
+        <RankingColumn title={t.weekendTitle} subtitle={t.weekendSubtitle} ratings={data.weekend} locale={locale} />
+        <RankingColumn title={t.tomorrowTitle} subtitle={t.tomorrowSubtitle} ratings={data.tomorrow} locale={locale} />
+        <RankingColumn title={t.weekdayTitle} subtitle={t.weekdaySubtitle} ratings={data.weekday} locale={locale} />
       </section>
     </main>
   );

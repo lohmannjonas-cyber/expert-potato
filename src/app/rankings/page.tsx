@@ -11,7 +11,7 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
   const locale = getLocale(params.lang);
   const t = dictionary[locale].filters;
   const date = parseDateInput(textParam(params.date));
-  const filters = parseRankingFilters(params, { avoidOffshoreWind: true });
+  const filters = { ...parseRankingFilters(params, { avoidOffshoreWind: true }), language: locale };
   const rankings = await getRankingsForDate(date, filters);
 
   return (
@@ -33,7 +33,7 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
 
       <section className="mt-6 grid gap-4 lg:grid-cols-2">
         {rankings.map((rating, index) => (
-          <RatingCard key={`${rating.spot.id}-${rating.windowStart.toISOString()}`} rating={rating} rank={index + 1} />
+          <RatingCard key={`${rating.spot.id}-${rating.windowStart.toISOString()}`} rating={rating} rank={index + 1} locale={locale} />
         ))}
       </section>
     </main>

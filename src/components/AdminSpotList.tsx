@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { regionLabel } from "@/lib/i18n";
 import type { KiteSpotInput } from "@/lib/scoring";
 
 export function AdminSpotList({ spots }: { spots: KiteSpotInput[] }) {
@@ -60,7 +61,7 @@ export function AdminSpotList({ spots }: { spots: KiteSpotInput[] }) {
                 placeholder="Admin notes"
                 className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
               />
-              <p className="text-xs font-bold text-slate-500">{spot.region}</p>
+              <p className="text-xs font-bold text-slate-500">{regionLabel(spot.region, "de")}</p>
             </div>
             <label className="text-xs font-bold text-slate-600">
               Good directions

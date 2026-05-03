@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { regionLabel } from "@/lib/i18n";
 import type { KiteSpotInput } from "@/lib/scoring";
 
 function escapeHtml(value: string) {
@@ -42,7 +43,7 @@ export function SpotMap({ spots }: { spots: KiteSpotInput[] }) {
 
       for (const spot of spots) {
         const name = escapeHtml(spot.name);
-        const region = escapeHtml(spot.region);
+        const region = escapeHtml(regionLabel(spot.region, "de"));
         const good = escapeHtml(spot.suitableWindDirections.join(", "));
         const unsafe = escapeHtml(spot.offshoreWindDirections.join(", "));
         const href = `/spots/${encodeURIComponent(spot.slug)}`;

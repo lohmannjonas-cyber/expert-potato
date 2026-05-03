@@ -61,6 +61,12 @@ export const dictionary = {
       avoidRain: "Regen vermeiden",
       avoidOffshore: "Offshore vermeiden",
       updateRankings: "Rankings aktualisieren"
+    },
+    regions: {
+      "Baltic Sea": "Ostsee",
+      "North Sea": "Nordsee",
+      Lakes: "Seen",
+      "South Germany": "Suddeutschland"
     }
   },
   en: {
@@ -111,6 +117,17 @@ export const dictionary = {
       avoidRain: "Avoid rain",
       avoidOffshore: "Avoid offshore",
       updateRankings: "Update rankings"
+    },
+    regions: {
+      "Baltic Sea": "Baltic Sea",
+      "North Sea": "North Sea",
+      Lakes: "Lakes",
+      "South Germany": "South Germany"
     }
   }
 } as const;
+
+export function regionLabel(region: string, locale: Locale) {
+  const labels = dictionary[locale].regions as Record<string, string>;
+  return labels[region] ?? region;
+}

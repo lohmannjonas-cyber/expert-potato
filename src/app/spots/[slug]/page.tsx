@@ -3,6 +3,7 @@ import { AlertTriangle, ExternalLink, Waves, Wind } from "lucide-react";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { RatingCard } from "@/components/RatingCard";
 import { getSpotWithForecast } from "@/lib/rankings";
+import { regionLabel } from "@/lib/i18n";
 
 export default async function SpotDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -15,7 +16,7 @@ export default async function SpotDetailPage({ params }: { params: Promise<{ slu
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <section className="grid gap-6 lg:grid-cols-[1fr_360px]">
         <div>
-          <p className="text-sm font-black uppercase tracking-normal text-lagoon">{spot.region}</p>
+          <p className="text-sm font-black uppercase tracking-normal text-lagoon">{regionLabel(spot.region, "de")}</p>
           <h1 className="mt-1 text-4xl font-black text-slate-950">{spot.name}</h1>
           <div className="mt-5 grid gap-3 sm:grid-cols-3">
             <span className="rounded-lg border border-slate-200 bg-white p-4 font-bold shadow-soft">Good wind: {spot.suitableWindDirections.join(", ")}</span>

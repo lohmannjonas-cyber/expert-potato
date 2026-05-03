@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import { COMPASS_DIRECTIONS } from "@/lib/wind";
 import type { RankingFilters } from "@/lib/rankings";
-import { dictionary, type Locale } from "@/lib/i18n";
+import { dictionary, regionLabel, type Locale } from "@/lib/i18n";
 
 const regions = ["Baltic Sea", "North Sea", "Lakes", "South Germany"];
 
@@ -69,7 +69,9 @@ export function FilterBar({
           <select name="region" defaultValue={values?.region ?? ""} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2">
             <option value="">{t.allGermany}</option>
             {regions.map((region) => (
-              <option key={region}>{region}</option>
+              <option key={region} value={region}>
+                {regionLabel(region, locale)}
+              </option>
             ))}
           </select>
         </label>
