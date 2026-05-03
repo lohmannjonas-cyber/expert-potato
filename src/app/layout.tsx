@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { Bell, CalendarDays, Gauge, Map, ShieldCheck, SlidersHorizontal, User, Waves } from "lucide-react";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { defaultLocale } from "@/lib/i18n";
@@ -51,7 +52,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   );
                 })}
               </nav>
-              <LanguageSwitch locale={defaultLocale} />
+              <Suspense fallback={null}>
+                <LanguageSwitch locale={defaultLocale} />
+              </Suspense>
             </div>
           </div>
         </header>
