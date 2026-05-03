@@ -1,0 +1,228 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum SkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum DateType {
+  ANY
+  WEEKDAY
+  WEEKEND
+}
+
+model User {
+  id                 String         @id @default(cuid())
+  name               String?
+  email              String         @unique
+  emailVerified      DateTime?
+  image              String?
+  passwordHash       String?
+  role               Role           @default(USER)
+  homeLat            Float?
+  homeLon            Float?
+  skillLevel         SkillLevel     @default(INTERMEDIATE)
+  preferredMinWind   Float          @default(15)
+  preferredMaxWind   Float          @default(25)
+  preferredSpotTypes String[]       @default([])
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  accounts           Account[]
+  sessions           Session[]
+  alerts             UserAlert[]
+  favorites          FavoriteSpot[]
+  ratings            SpotRating[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model KiteSpot {
+  id                     String         @id @default(cuid())
+  slug                   String         @unique
+  name                   String
+  region                 String
+  latitude               Float
+  longitude              Float
+  suitableWindDirections String[]       @default([])
+  offshoreWindDirections String[]       @default([])
+  idealMinWindKnots      Float          @default(15)
+  idealMaxWindKnots      Float          @default(25)
+  beginnerFriendly       Boolean        @default(false)
+  spotTypes              String[]       @default([])
+  tideRelevant           Boolean        @default(false)
+  thermalPotential       Int            @default(0)
+  parkingInfo            String?
+  waterDepth             String?
+  seasonRestrictions     String?
+  dangerNotes            String[]       @default([])
+  webcamUrl              String?
+  localInfoUrl           String?
+  restricted             Boolean        @default(false)
+  adminNotes             String?
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+
+  forecasts              ForecastData[]
+  ratings                SpotRating[]
+  favorites              FavoriteSpot[]
+  notificationLogs       NotificationLog[]
+}
+
+model ForecastData {
+  id                     String   @id @default(cuid())
+  spotId                 String
+  source                 String   @default("open-meteo")
+  forecastTime           DateTime
+  windSpeedKnots         Float
+  gustKnots              Float
+  windDirectionDegrees   Float
+  windDirectionCompass   String
+  temperatureC           Float
+  precipitationMm        Float
+  cloudCoverPercent      Float
+  weatherWarnings        String[] @default([])
+  raw                    Json?
+  createdAt              DateTime @default(now())
+
+  spot                   KiteSpot @relation(fields: [spotId], references: [id], onDelete: Cascade)
+
+  @@unique([spotId, forecastTime, source])
+  @@index([forecastTime])
+  @@index([spotId, forecastTime])
+}
+
+model SpotRating {
+  id                    String   @id @default(cuid())
+  key                   String   @unique
+  spotId                String
+  userId                String?
+  forecastDate          DateTime
+  windowStart           DateTime
+  windowEnd             DateTime
+  score                 Int
+  explanation           String
+  windDirectionQuality  String
+  windStrengthQuality   String
+  riskWarnings          String[] @default([])
+  bestTimeWindow        String
+  beginnerWarning       String?
+  ratingMeta            Json?
+  createdAt             DateTime @default(now())
+
+  spot                  KiteSpot @relation(fields: [spotId], references: [id], onDelete: Cascade)
+  user                  User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([forecastDate, score])
+  @@index([spotId, forecastDate])
+}
+
+model UserAlert {
+  id                String     @id @default(cuid())
+  userId            String
+  name              String
+  enabled           Boolean    @default(true)
+  selectedSpotIds   String[]   @default([])
+  windDirections    String[]   @default([])
+  minWindKnots      Float?
+  maxWindKnots      Float?
+  maxGustKnots      Float?
+  dateType          DateType   @default(ANY)
+  minTemperatureC   Float?
+  maxRainMm         Float?
+  region            String?
+  maxTravelKm       Float?
+  beginnerOnly      Boolean    @default(false)
+  flatWaterOnly     Boolean    @default(false)
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  user              User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notificationLogs  NotificationLog[]
+
+  @@index([userId, enabled])
+}
+
+model FavoriteSpot {
+  userId    String
+  spotId    String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  spot      KiteSpot @relation(fields: [spotId], references: [id], onDelete: Cascade)
+
+  @@id([userId, spotId])
+}
+
+model NotificationLog {
+  id                  String    @id @default(cuid())
+  alertId             String
+  userId              String
+  spotId              String
+  forecastWindowStart DateTime
+  channel             String    @default("email")
+  fingerprint         String    @unique
+  sentAt              DateTime  @default(now())
+
+  alert               UserAlert @relation(fields: [alertId], references: [id], onDelete: Cascade)
+  spot                KiteSpot   @relation(fields: [spotId], references: [id], onDelete: Cascade)
+
+  @@index([userId, sentAt])
+  @@index([spotId, forecastWindowStart])
+}
+
+model ScoringRule {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  label       String
+  weight      Float
+  settings    Json
+  active      Boolean  @default(true)
+  updatedAt   DateTime @updatedAt
+}
