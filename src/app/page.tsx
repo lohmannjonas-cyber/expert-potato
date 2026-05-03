@@ -5,6 +5,7 @@ import { FilterBar } from "@/components/FilterBar";
 import { RatingCard } from "@/components/RatingCard";
 import { getDashboardData } from "@/lib/rankings";
 import { activeFilterLabels, parseRankingFilters, queryStringFromParams } from "@/lib/filter-params";
+import { dictionary, getLocale } from "@/lib/i18n";
 
 function RankingColumn({
   title,
@@ -32,6 +33,8 @@ function RankingColumn({
 
 export default async function Home({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const params = await searchParams;
+  const locale = getLocale(params.lang);
+  const t = dictionary[locale].home;
   const filters = parseRankingFilters(params, { avoidOffshoreWind: true });
   const queryString = queryStringFromParams(params);
   const rankingsHref = queryString ? `/rankings?${queryString}` : "/rankings";
@@ -44,20 +47,20 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8">
           <div>
-            <p className="text-sm font-black uppercase tracking-normal text-lagoon">Live kite-condition ranking</p>
+            <p className="text-sm font-black uppercase tracking-normal text-lagoon">{t.eyebrow}</p>
             <h1 className="mt-3 max-w-3xl text-4xl font-black tracking-normal text-slate-950 sm:text-5xl">
               KiteSpot Radar Germany
             </h1>
             <p className="mt-4 max-w-2xl text-lg leading-8 text-slate-700">
-              Wind, gusts, rain, temperature, daylight, safety angles, spot type, and rider preferences are converted into a 0-100 kite score for German spots.
+              {t.intro}
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link href={rankingsHref} className="focus-ring inline-flex items-center gap-2 rounded-md bg-lagoon px-5 py-3 font-black text-white hover:bg-current">
-                Open rankings
+                {t.openRankings}
                 <ArrowRight size={18} />
               </Link>
               <Link href="/alerts" className="focus-ring inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-5 py-3 font-black text-slate-800 hover:bg-slate-50">
-                Create alert
+                {t.createAlert}
                 <Bell size={18} />
               </Link>
             </div>
@@ -68,7 +71,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
               <>
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-sm font-black uppercase tracking-normal text-slate-500">Current lead</p>
+                    <p className="text-sm font-black uppercase tracking-normal text-slate-500">{t.currentLead}</p>
                     <h2 className="mt-1 text-2xl font-black text-slate-950">{top.spot.name}</h2>
                   </div>
                   <span className="rounded-lg bg-lagoon px-4 py-3 text-2xl font-black text-white">{top.score}</span>
@@ -81,7 +84,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
                 </div>
               </>
             ) : (
-              <p className="text-slate-700">No ranking data yet. Seed the spots and run the weather crawler.</p>
+              <p className="text-slate-700">{t.noData}</p>
             )}
           </div>
         </div>
@@ -90,12 +93,12 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-black uppercase tracking-normal text-lagoon">Dashboard filters</p>
-            <h2 className="mt-1 text-2xl font-black text-slate-950">Tune every dashboard card</h2>
+            <p className="text-sm font-black uppercase tracking-normal text-lagoon">{t.filtersEyebrow}</p>
+            <h2 className="mt-1 text-2xl font-black text-slate-950">{t.filtersTitle}</h2>
           </div>
           {activeFilters.length ? (
             <Link href="/" className="text-sm font-black text-lagoon hover:text-current">
-              Clear filters
+              {t.clearFilters}
             </Link>
           ) : null}
         </div>
@@ -114,14 +117,16 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
           submitLabel="Update dashboard"
           autoSubmit
           hideSubmit
+          showDayType={false}
+          locale={locale}
           values={{ ...filters, date: format(new Date(), "yyyy-MM-dd") }}
         />
       </section>
 
       <section className="mx-auto grid max-w-7xl gap-5 px-4 pb-10 sm:px-6 xl:grid-cols-3 lg:px-8">
-        <RankingColumn title="Best Spots This Weekend" subtitle="Weekend-only ranking with offshore risk avoided." ratings={data.weekend} />
-        <RankingColumn title="Best Spots Tomorrow" subtitle="Top 10 sessions for the next forecast day." ratings={data.tomorrow} />
-        <RankingColumn title="Best Weekday Sessions" subtitle="Nearest weekday windows for after-work planning." ratings={data.weekday} />
+        <RankingColumn title={t.weekendTitle} subtitle={t.weekendSubtitle} ratings={data.weekend} />
+        <RankingColumn title={t.tomorrowTitle} subtitle={t.tomorrowSubtitle} ratings={data.tomorrow} />
+        <RankingColumn title={t.weekdayTitle} subtitle={t.weekdaySubtitle} ratings={data.weekday} />
       </section>
     </main>
   );

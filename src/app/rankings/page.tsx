@@ -4,9 +4,12 @@ import { RatingCard } from "@/components/RatingCard";
 import { getRankingsForDate } from "@/lib/rankings";
 import { parseDateInput } from "@/lib/dates";
 import { parseRankingFilters, textParam } from "@/lib/filter-params";
+import { dictionary, getLocale } from "@/lib/i18n";
 
 export default async function RankingsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const params = await searchParams;
+  const locale = getLocale(params.lang);
+  const t = dictionary[locale].filters;
   const date = parseDateInput(textParam(params.date));
   const filters = parseRankingFilters(params, { avoidOffshoreWind: true });
   const rankings = await getRankingsForDate(date, filters);
@@ -23,6 +26,8 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
 
       <FilterBar
         defaultDate={format(addDays(new Date(), 1), "yyyy-MM-dd")}
+        submitLabel={t.updateRankings}
+        locale={locale}
         values={{ ...filters, date: format(date, "yyyy-MM-dd") }}
       />
 
