@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import type { Locale } from "@/lib/i18n";
 
@@ -15,7 +16,7 @@ function hrefFor(pathname: string, search: URLSearchParams, locale: Locale) {
   return query ? `${pathname}?${query}` : pathname;
 }
 
-export function LanguageSwitch({ locale: fallbackLocale }: { locale: Locale }) {
+function LanguageSwitchInner({ locale: fallbackLocale }: { locale: Locale }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const locale = searchParams.get("lang") === "en" ? "en" : fallbackLocale;
@@ -35,5 +36,13 @@ export function LanguageSwitch({ locale: fallbackLocale }: { locale: Locale }) {
         EN
       </Link>
     </div>
+  );
+}
+
+export function LanguageSwitch({ locale }: { locale: Locale }) {
+  return (
+    <Suspense fallback={null}>
+      <LanguageSwitchInner locale={locale} />
+    </Suspense>
   );
 }

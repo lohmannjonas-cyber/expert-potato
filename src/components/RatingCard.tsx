@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AlertTriangle, ArrowRight, CloudRain, Navigation, ThermometerSun, Wind } from "lucide-react";
+import { AlertTriangle, ArrowRight, CloudRain, ThermometerSun, Wind } from "lucide-react";
 import { ScoreBadge } from "@/components/ScoreBadge";
 import { regionLabel, type Locale } from "@/lib/i18n";
 import { compassToDegrees } from "@/lib/wind";
@@ -31,6 +31,22 @@ function metricClass(tone: string) {
   return `flex items-center gap-2 rounded-md px-3 py-2 font-semibold ring-1 ${tone}`;
 }
 
+function DirectionArrow({ degrees }: { degrees: number }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className="h-5 w-5 text-lagoon"
+      style={{
+        transform: `rotate(${Number.isFinite(degrees) ? degrees : 0}deg)`,
+        transformOrigin: "50% 50%"
+      }}
+    >
+      <path d="M12 2.5 18.5 11H15v10h-6V11H5.5L12 2.5Z" fill="currentColor" />
+    </svg>
+  );
+}
+
 export function RatingCard({ rating, rank, locale = "de" }: { rating: SpotRatingResult; rank?: number; locale?: Locale }) {
   const wind = rating.meta.averageWindKnots;
   const temp = rating.meta.averageTemperatureC;
@@ -60,11 +76,9 @@ export function RatingCard({ rating, rank, locale = "de" }: { rating: SpotRating
           {wind} {windLabel}
         </span>
         <span className="flex items-center gap-2 rounded-md bg-slate-50 px-3 py-2 font-semibold text-slate-700 ring-1 ring-slate-200">
-          <Navigation
-            size={16}
-            className="text-lagoon"
-            style={{ transform: `rotate(${Number.isFinite(directionDegrees) ? directionDegrees : 0}deg)` }}
-          />
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white ring-1 ring-slate-200">
+            <DirectionArrow degrees={directionDegrees} />
+          </span>
           {rating.meta.dominantDirection}
         </span>
         <span className={metricClass(temperatureTone(temp))} title="Temperature: blue cold, green comfortable, yellow warm">
