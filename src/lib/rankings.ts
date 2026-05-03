@@ -4,7 +4,7 @@ import { dateKey, nextSaturday, nextWeekday, parseDateInput } from "@/lib/dates"
 import { prisma } from "@/lib/prisma";
 import { type ForecastHour, type KiteSpotInput, type RatingPreferences, rateSpotForDate } from "@/lib/scoring";
 import { loadActiveScoringWeights } from "@/lib/scoring-rules";
-import { fetchForecastForSpot } from "@/lib/weather";
+import { activeWeatherSource, fetchForecastForSpot } from "@/lib/weather";
 
 export type RankingFilters = RatingPreferences & {
   date?: string;
@@ -61,6 +61,7 @@ async function loadForecasts(spots: KiteSpotInput[], date: Date): Promise<Map<st
     const rows = await prisma.forecastData.findMany({
       where: {
         spotId: { in: spots.map((spot) => spot.id) },
+        source: activeWeatherSource(),
         forecastTime: {
           gte: from,
           lt: to

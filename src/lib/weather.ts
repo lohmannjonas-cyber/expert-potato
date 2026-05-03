@@ -16,6 +16,30 @@ type OpenMeteoResponse = {
   };
 };
 
+type WindyResponse = {
+  ts?: number[];
+  units?: Record<string, string | null>;
+  "wind_u-surface"?: Array<number | null>;
+  "wind_v-surface"?: Array<number | null>;
+  "gust-surface"?: Array<number | null>;
+  "temp-surface"?: Array<number | null>;
+  "past3hprecip-surface"?: Array<number | null>;
+  "lclouds-surface"?: Array<number | null>;
+  "mclouds-surface"?: Array<number | null>;
+  "hclouds-surface"?: Array<number | null>;
+};
+
+const WINDY_ENDPOINT = "https://api.windy.com/api/point-forecast/v2";
+
+export function activeWeatherSource() {
+  const provider = process.env.WEATHER_PROVIDER?.toLowerCase();
+  const windyKey = process.env.WINDY_API_KEY;
+  if (provider === "windy" && windyKey) {
+    return `windy-${process.env.WINDY_MODEL ?? "iconEu"}`;
+  }
+  return "open-meteo";
+}
+
 function spotSelectToInput(spot: KiteSpotInput): KiteSpotInput {
   return {
     id: spot.id,
@@ -43,7 +67,87 @@ function spotSelectToInput(spot: KiteSpotInput): KiteSpotInput {
   };
 }
 
-export async function fetchForecastForSpot(spot: KiteSpotInput, forecastDays = 7): Promise<ForecastHour[]> {
+function toKnots(value: number, unit?: string | null) {
+  if (!unit || unit === "m*s-1") return value * 1.94384449;
+  if (unit === "km*h-1") return value / 1.852;
+  if (unit.toLowerCase().includes("kt")) return value;
+  return value;
+}
+
+function toCelsius(value: number, unit?: string | null) {
+  if (!unit || unit === "K") return value - 273.15;
+  if (unit === "F") return (value - 32) * (5 / 9);
+  return value;
+}
+
+function roundMetric(value: number) {
+  return Math.round(value * 10) / 10;
+}
+
+function windVectorToDirectionDegrees(u: number, v: number) {
+  return ((Math.atan2(-u, -v) * 180) / Math.PI + 360) % 360;
+}
+
+async function fetchWindyForecastForSpot(spot: KiteSpotInput, forecastDays: number): Promise<ForecastHour[]> {
+  const key = process.env.WINDY_API_KEY;
+  if (!key) {
+    throw new Error("WINDY_API_KEY is required when WEATHER_PROVIDER=windy");
+  }
+
+  const model = process.env.WINDY_MODEL ?? "iconEu";
+  const response = await fetch(WINDY_ENDPOINT, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      lat: spot.latitude,
+      lon: spot.longitude,
+      model,
+      parameters: ["wind", "windGust", "temp", "precip", "lclouds", "mclouds", "hclouds"],
+      levels: ["surface"],
+      key
+    }),
+    next: { revalidate: 60 * 60 }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Windy API failed for ${spot.name}: ${response.status}`);
+  }
+
+  const data = (await response.json()) as WindyResponse;
+  if (!data.ts?.length) return [];
+
+  const units = data.units ?? {};
+  const windUnit = units["wind_u-surface"];
+  const gustUnit = units["gust-surface"];
+  const tempUnit = units["temp-surface"];
+  const maxTime = addDays(new Date(), forecastDays).getTime();
+
+  return data.ts
+    .map((timestamp, index) => {
+      const u = data["wind_u-surface"]?.[index] ?? 0;
+      const v = data["wind_v-surface"]?.[index] ?? 0;
+      const speed = Math.sqrt(u * u + v * v);
+      const directionDegrees = windVectorToDirectionDegrees(u, v);
+      const lowClouds = data["lclouds-surface"]?.[index] ?? 0;
+      const midClouds = data["mclouds-surface"]?.[index] ?? 0;
+      const highClouds = data["hclouds-surface"]?.[index] ?? 0;
+
+      return {
+        forecastTime: new Date(timestamp),
+        windSpeedKnots: roundMetric(toKnots(speed, windUnit)),
+        gustKnots: roundMetric(toKnots(data["gust-surface"]?.[index] ?? speed, gustUnit)),
+        windDirectionDegrees: roundMetric(directionDegrees),
+        windDirectionCompass: degreesToCompass(directionDegrees),
+        temperatureC: roundMetric(toCelsius(data["temp-surface"]?.[index] ?? 273.15, tempUnit)),
+        precipitationMm: roundMetric(data["past3hprecip-surface"]?.[index] ?? 0),
+        cloudCoverPercent: roundMetric(Math.max(lowClouds, midClouds, highClouds)),
+        weatherWarnings: []
+      };
+    })
+    .filter((hour) => hour.forecastTime.getTime() <= maxTime);
+}
+
+async function fetchOpenMeteoForecastForSpot(spot: KiteSpotInput, forecastDays = 7): Promise<ForecastHour[]> {
   const apiUrl = process.env.WEATHER_API_URL ?? "https://api.open-meteo.com/v1/forecast";
   const params = new URLSearchParams({
     latitude: String(spot.latitude),
@@ -89,19 +193,32 @@ export async function fetchForecastForSpot(spot: KiteSpotInput, forecastDays = 7
   });
 }
 
+export async function fetchForecastForSpot(spot: KiteSpotInput, forecastDays = 7): Promise<ForecastHour[]> {
+  if (process.env.WEATHER_PROVIDER?.toLowerCase() === "windy" && process.env.WINDY_API_KEY) {
+    try {
+      return await fetchWindyForecastForSpot(spot, forecastDays);
+    } catch (error) {
+      console.warn(error);
+    }
+  }
+
+  return fetchOpenMeteoForecastForSpot(spot, forecastDays);
+}
+
 export async function refreshForecastsForAllSpots(forecastDays = 7) {
   const spots = (await prisma.kiteSpot.findMany()).map(spotSelectToInput);
   const summary = [];
 
   for (const spot of spots) {
     const forecast = await fetchForecastForSpot(spot, forecastDays);
+    const source = activeWeatherSource();
     for (const hour of forecast) {
       await prisma.forecastData.upsert({
         where: {
           spotId_forecastTime_source: {
             spotId: spot.id,
             forecastTime: hour.forecastTime,
-            source: "open-meteo"
+            source
           }
         },
         update: {
@@ -113,11 +230,11 @@ export async function refreshForecastsForAllSpots(forecastDays = 7) {
           precipitationMm: hour.precipitationMm,
           cloudCoverPercent: hour.cloudCoverPercent,
           weatherWarnings: hour.weatherWarnings,
-          raw: { ...hour, forecastTime: hour.forecastTime.toISOString() }
+          raw: { ...hour, forecastTime: hour.forecastTime.toISOString(), source }
         },
         create: {
           spotId: spot.id,
-          source: "open-meteo",
+          source,
           forecastTime: hour.forecastTime,
           windSpeedKnots: hour.windSpeedKnots,
           gustKnots: hour.gustKnots,
@@ -127,7 +244,7 @@ export async function refreshForecastsForAllSpots(forecastDays = 7) {
           precipitationMm: hour.precipitationMm,
           cloudCoverPercent: hour.cloudCoverPercent,
           weatherWarnings: hour.weatherWarnings,
-          raw: { ...hour, forecastTime: hour.forecastTime.toISOString() }
+          raw: { ...hour, forecastTime: hour.forecastTime.toISOString(), source }
         }
       });
     }
@@ -148,6 +265,7 @@ export async function refreshSpotRatings(forecastDays = 7) {
     const forecastRows = await prisma.forecastData.findMany({
       where: {
         spotId: spot.id,
+        source: activeWeatherSource(),
         forecastTime: { gte: from, lt: to }
       },
       orderBy: { forecastTime: "asc" }

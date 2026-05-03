@@ -7,7 +7,7 @@ KiteSpot Radar Germany is a full-stack Next.js app that collects wind and weathe
 - Next.js App Router and TypeScript
 - PostgreSQL with Prisma ORM
 - Tailwind CSS and React components
-- Open-Meteo-compatible weather ingestion
+- Open-Meteo and Windy Point Forecast weather ingestion
 - NextAuth credentials login
 - Leaflet map
 - Resend email integration
@@ -78,7 +78,13 @@ Change these before using the app outside local development.
 
 `NEXTAUTH_URL` and `NEXTAUTH_SECRET` configure login sessions.
 
+`WEATHER_PROVIDER` controls the forecast source. Use `open-meteo` without an API key, or `windy` with a Windy Point Forecast API key.
+
 `WEATHER_API_URL` defaults to an Open-Meteo-compatible forecast endpoint.
+
+`WINDY_API_KEY` enables Windy Point Forecast ingestion when `WEATHER_PROVIDER=windy`.
+
+`WINDY_MODEL` defaults to `iconEu`, which is a good starting model for Germany.
 
 `WEATHER_TIMEZONE` defaults to `Europe/Berlin`.
 
@@ -94,7 +100,17 @@ Run a manual crawl:
 npm run weather:crawl
 ```
 
-This fetches hourly forecast data for all seeded spots and refreshes stored guest ratings for the next seven days.
+This fetches forecast data for all seeded spots and refreshes stored guest ratings for the next seven days.
+
+To use Windy instead of Open-Meteo, add these values to `.env` and to your Vercel environment variables:
+
+```bash
+WEATHER_PROVIDER="windy"
+WINDY_API_KEY="your-windy-point-forecast-key"
+WINDY_MODEL="iconEu"
+```
+
+Windy Point Forecast uses `POST https://api.windy.com/api/point-forecast/v2`. The crawler requests surface wind, gusts, temperature, precipitation, and low/mid/high cloud cover, then converts the result into the same kite scoring format used by the dashboard.
 
 The API route can also be called by a scheduler:
 
