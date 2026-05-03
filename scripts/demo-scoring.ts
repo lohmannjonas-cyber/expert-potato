@@ -7,7 +7,7 @@ date.setHours(0, 0, 0, 0);
 
 const ratings = demoSpots
   .map((spot) => rateSpotForDate(spot, generateDemoForecast(spot, date, 1), date, { avoidOffshoreWind: true }))
-  .filter(Boolean)
+  .filter((rating): rating is NonNullable<typeof rating> => Boolean(rating))
   .sort((a, b) => b.score - a.score)
   .slice(0, 10);
 

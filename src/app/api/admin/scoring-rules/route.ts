@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { Prisma } from "@prisma/client";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -37,13 +38,21 @@ export async function PUT(request: Request) {
   }
 
   const rules = await Promise.all(
-    parsed.data.rules.map((rule) =>
-      prisma.scoringRule.upsert({
+    parsed.data.rules.map((rule) => {
+      const data = {
+        key: rule.key,
+        label: rule.label,
+        weight: rule.weight,
+        settings: rule.settings as Prisma.InputJsonValue,
+        active: rule.active
+      };
+
+      return prisma.scoringRule.upsert({
         where: { key: rule.key },
-        update: rule,
-        create: rule
-      })
-    )
+        update: data,
+        create: data
+      });
+    })
   );
 
   return NextResponse.json({ rules });
