@@ -13,7 +13,7 @@ export function FavoriteButton({ spotId }: { spotId: string }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ spotId })
     });
-    setMessage(response.ok ? "Saved to favorites." : "Sign in to save this spot.");
+    setMessage(response.ok ? "Als Favorit gespeichert." : "Melde dich an, um diesen Spot zu speichern.");
   }
 
   return (
@@ -24,7 +24,7 @@ export function FavoriteButton({ spotId }: { spotId: string }) {
         className="focus-ring inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-4 py-2 font-black text-slate-800 hover:bg-slate-50"
       >
         <Star size={17} />
-        Favorite
+        Favorit
       </button>
       <span className="text-sm font-semibold text-slate-600">{message}</span>
     </div>

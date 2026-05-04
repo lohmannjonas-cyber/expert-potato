@@ -80,7 +80,9 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
                 </div>
                 <p className="mt-4 text-sm leading-6 text-slate-700">{top.explanation}</p>
                 <div className="mt-4 grid gap-2 sm:grid-cols-3">
-                  <span className="rounded-md bg-white px-3 py-2 text-sm font-bold text-slate-700">{top.meta.averageWindKnots} kt avg</span>
+                  <span className="rounded-md bg-white px-3 py-2 text-sm font-bold text-slate-700">
+                    {top.meta.averageWindKnots} {locale === "de" ? "kt Schnitt" : "kt avg"}
+                  </span>
                   <span className="rounded-md bg-white px-3 py-2 text-sm font-bold text-slate-700">{top.meta.dominantDirection}</span>
                   <span className="rounded-md bg-white px-3 py-2 text-sm font-bold text-slate-700">{top.bestTimeWindow}</span>
                 </div>

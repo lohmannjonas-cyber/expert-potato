@@ -30,7 +30,7 @@ export function AdminSpotList({ spots }: { spots: KiteSpotInput[] }) {
         adminNotes: formData.get("adminNotes") || null
       })
     });
-    setMessage(response.ok ? "Spot updated." : "Admin sign-in is required.");
+    setMessage(response.ok ? "Spot aktualisiert." : "Admin-Anmeldung erforderlich.");
   }
 
   async function deleteSpot(id: string) {
@@ -38,16 +38,16 @@ export function AdminSpotList({ spots }: { spots: KiteSpotInput[] }) {
     const response = await fetch(`/api/spots/${id}`, { method: "DELETE" });
     if (response.ok) {
       setItems((current) => current.filter((spot) => spot.id !== id));
-      setMessage("Spot deleted.");
+      setMessage("Spot geloescht.");
     } else {
-      setMessage("Admin sign-in is required.");
+      setMessage("Admin-Anmeldung erforderlich.");
     }
   }
 
   return (
     <div className="rounded-lg border border-slate-200 bg-white shadow-soft">
       <div className="flex items-center justify-between gap-3 border-b border-slate-200 p-4">
-        <h2 className="font-black text-slate-950">Kite spots</h2>
+        <h2 className="font-black text-slate-950">Kitespots</h2>
         <span className="text-sm font-semibold text-slate-600">{message}</span>
       </div>
       <div className="divide-y divide-slate-200">
@@ -58,13 +58,13 @@ export function AdminSpotList({ spots }: { spots: KiteSpotInput[] }) {
               <input
                 name="adminNotes"
                 defaultValue={spot.adminNotes ?? ""}
-                placeholder="Admin notes"
+                placeholder="Admin-Notizen"
                 className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
               />
               <p className="text-xs font-bold text-slate-500">{regionLabel(spot.region, "de")}</p>
             </div>
             <label className="text-xs font-bold text-slate-600">
-              Good directions
+              Gute Richtungen
               <input name="suitableWindDirections" defaultValue={spot.suitableWindDirections.join(", ")} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm" />
             </label>
             <label className="text-xs font-bold text-slate-600">
@@ -84,20 +84,20 @@ export function AdminSpotList({ spots }: { spots: KiteSpotInput[] }) {
               </div>
               <div className="flex flex-wrap gap-2 text-xs font-bold text-slate-700">
                 <label className="flex items-center gap-1 rounded-md bg-slate-50 px-2 py-1">
-                  <input name="beginnerFriendly" type="checkbox" defaultChecked={spot.beginnerFriendly} /> Beginner
+                  <input name="beginnerFriendly" type="checkbox" defaultChecked={spot.beginnerFriendly} /> Einsteiger
                 </label>
                 <label className="flex items-center gap-1 rounded-md bg-slate-50 px-2 py-1">
-                  <input name="restricted" type="checkbox" defaultChecked={spot.restricted} /> Restricted
+                  <input name="restricted" type="checkbox" defaultChecked={spot.restricted} /> Eingeschraenkt
                 </label>
               </div>
               <div className="flex gap-2">
-                <button className="focus-ring rounded-md bg-lagoon px-3 py-2 text-sm font-black text-white">Save</button>
+                <button className="focus-ring rounded-md bg-lagoon px-3 py-2 text-sm font-black text-white">Speichern</button>
                 <button
                   type="button"
                   onClick={() => deleteSpot(spot.id)}
                   className="focus-ring rounded-md border border-slate-300 px-3 py-2 text-sm font-black text-slate-700"
                 >
-                  Delete
+                  Loeschen
                 </button>
               </div>
             </div>

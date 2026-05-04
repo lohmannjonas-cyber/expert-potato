@@ -16,12 +16,12 @@ export const dictionary = {
   de: {
     nav: {
       dashboard: "Dashboard",
-      rankings: "Rankings",
+      rankings: "Rangliste",
       map: "Karte",
       calendar: "Kalender",
-      alerts: "Alerts",
+      alerts: "Alarme",
       profile: "Profil",
-      admin: "Admin"
+      admin: "Verwaltung"
     },
     layout: {
       tagline: "Vorhersagen werden zu Kite-Entscheidungen"
@@ -30,8 +30,8 @@ export const dictionary = {
       eyebrow: "Live Kite-Spot Ranking",
       intro:
         "Wind, Boeen, Regen, Temperatur, Tageslicht, Sicherheitswinkel, Spot-Typ und Fahrerprofil werden zu einem Kite-Score von 0 bis 100 verarbeitet.",
-      openRankings: "Rankings offnen",
-      createAlert: "Alert erstellen",
+      openRankings: "Rangliste oeffnen",
+      createAlert: "Alarm erstellen",
       currentLead: "Aktuell vorne",
       noData: "Noch keine Ranking-Daten vorhanden.",
       filtersEyebrow: "Dashboard Filter",

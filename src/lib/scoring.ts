@@ -156,8 +156,33 @@ function translateWarning(warning: string, language: "de" | "en") {
     "Outside practical daylight window": "Ausserhalb eines sinnvollen Tageslichtfensters",
     "Spot marked restricted by admin": "Spot ist vom Admin als eingeschraenkt markiert"
   };
-  if (warning.startsWith("Season note:")) return warning.replace("Season note:", "Saisonhinweis:");
+  if (warning.startsWith("Season note:")) return `Saisonhinweis: ${translateSeasonNote(warning.replace("Season note:", "").trim())}`;
   return translations[warning] ?? warning;
+}
+
+function translateSeasonNote(note: string) {
+  const translations: Record<string, string> = {
+    "Respect marked bathing zones during summer.": "Markierte Badezonen im Sommer beachten.",
+    "Nature protection zones must be observed year-round.": "Naturschutzzonen muessen ganzjaehrig beachtet werden.",
+    "Use official kite zones and respect reed beds.": "Offizielle Kitezonen nutzen und Schilfbereiche respektieren.",
+    "Follow campsite and beach zone rules.": "Campingplatz- und Strandzonenregeln beachten.",
+    "Observe protected coastal zones.": "Geschuetzte Kuestenzonen beachten.",
+    "Summer bathing zones and lifeguard rules apply.": "Sommerliche Badezonen und Rettungsschwimmer-Regeln beachten.",
+    "Respect national park and bathing zone rules.": "Nationalpark- und Badezonenregeln beachten.",
+    "Respect bathing areas and local water sport zones.": "Badebereiche und lokale Wassersportzonen beachten.",
+    "Respect bathing zones and local launch markings.": "Badezonen und lokale Startmarkierungen beachten.",
+    "Respect marina, sailing, and event zones.": "Hafen-, Segel- und Veranstaltungszonen beachten.",
+    "Bathing zones are relevant in summer.": "Badezonen sind im Sommer relevant.",
+    "Respect beach, bathing, and national park rules.": "Strand-, Bade- und Nationalparkregeln beachten.",
+    "Nature protection zones around Monchgut must be observed.": "Naturschutzzonen rund um Moenchgut beachten.",
+    "Bathing zones and beach rules apply.": "Badezonen und Strandregeln beachten.",
+    "Respect harbor, beach, and national park restrictions.": "Hafen-, Strand- und Nationalparkbeschraenkungen beachten.",
+    "National park and beach zones are strict.": "Nationalpark- und Strandzonen sind streng geregelt.",
+    "Beach zones, events, and nature rules apply.": "Strandzonen, Veranstaltungen und Naturschutzregeln beachten.",
+    "Local rules and bathing zones apply.": "Lokale Regeln und Badezonen beachten."
+  };
+
+  return translations[note] ?? note;
 }
 
 function weights(preferences: RatingPreferences) {
@@ -306,7 +331,10 @@ function summarizeWindow(spot: KiteSpotInput, window: HourScore[], preferences: 
   let beginnerWarning: string | undefined;
   if ((preferences.skillLevel === "BEGINNER" || preferences.beginnerOnly) && !spot.beginnerFriendly) {
     profilePenalty += scoringWeights.profile * 2;
-    beginnerWarning = "Beginner unsuitable warning: this spot needs confident upwind riding and self-rescue.";
+    beginnerWarning =
+      preferences.language === "de"
+        ? "Einsteiger-Warnung: Dieser Spot erfordert sicheres Hoehelaufen und Selbstrettung."
+        : "Beginner unsuitable warning: this spot needs confident upwind riding and self-rescue.";
   }
   if (preferences.flatWaterOnly && !spot.spotTypes.includes("flat")) profilePenalty += scoringWeights.profile * 1.6;
   if (preferences.waveOnly && !spot.spotTypes.includes("wave")) profilePenalty += scoringWeights.profile * 1.6;
@@ -408,7 +436,7 @@ export function rateSpotForDate(
         ? "Boeen brauchen Vorsicht"
         : "gusts need caution"
       : language === "de"
-        ? "moderate Boeen"
+        ? "maessige Boeen"
         : "moderate gusts";
 
   const riskWarnings = [...best.summary.warnings];

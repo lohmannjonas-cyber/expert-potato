@@ -1,4 +1,5 @@
 import type { RankingFilters } from "@/lib/rankings";
+import { regionLabel } from "@/lib/i18n";
 
 export type SearchParamsRecord = Record<string, string | string[] | undefined>;
 
@@ -41,18 +42,19 @@ export function parseRankingFilters(params: SearchParamsRecord, defaults: Partia
 
 export function activeFilterLabels(filters: RankingFilters) {
   const labels: string[] = [];
-  if (filters.region) labels.push(filters.region);
-  if (filters.dateType === "WEEKEND") labels.push("weekend only");
-  if (filters.dateType === "WEEKDAY") labels.push("weekday only");
-  if (filters.minWindSpeed) labels.push(`min ${filters.minWindSpeed} kt`);
-  if (filters.maxWindSpeed) labels.push(`max ${filters.maxWindSpeed} kt`);
-  if (filters.preferredDirection) labels.push(`${filters.preferredDirection} wind`);
-  if (filters.temperatureMinimum) labels.push(`min ${filters.temperatureMinimum} C`);
-  if (filters.beginnerOnly) labels.push("beginner friendly");
-  if (filters.flatWaterOnly) labels.push("flat water");
-  if (filters.waveOnly) labels.push("wave spots");
-  if (filters.avoidRain) labels.push("avoid rain");
-  if (filters.avoidOffshoreWind) labels.push("avoid offshore");
+  const german = filters.language !== "en";
+  if (filters.region) labels.push(german ? regionLabel(filters.region, "de") : filters.region);
+  if (filters.dateType === "WEEKEND") labels.push(german ? "nur Wochenende" : "weekend only");
+  if (filters.dateType === "WEEKDAY") labels.push(german ? "nur Wochentag" : "weekday only");
+  if (filters.minWindSpeed) labels.push(german ? `min. ${filters.minWindSpeed} kt` : `min ${filters.minWindSpeed} kt`);
+  if (filters.maxWindSpeed) labels.push(german ? `max. ${filters.maxWindSpeed} kt` : `max ${filters.maxWindSpeed} kt`);
+  if (filters.preferredDirection) labels.push(german ? `Wind aus ${filters.preferredDirection}` : `${filters.preferredDirection} wind`);
+  if (filters.temperatureMinimum) labels.push(german ? `min. ${filters.temperatureMinimum} C` : `min ${filters.temperatureMinimum} C`);
+  if (filters.beginnerOnly) labels.push(german ? "einsteigerfreundlich" : "beginner friendly");
+  if (filters.flatWaterOnly) labels.push(german ? "Flachwasser" : "flat water");
+  if (filters.waveOnly) labels.push(german ? "Wellen-Spots" : "wave spots");
+  if (filters.avoidRain) labels.push(german ? "Regen vermeiden" : "avoid rain");
+  if (filters.avoidOffshoreWind) labels.push(german ? "Offshore vermeiden" : "avoid offshore");
   return labels;
 }
 

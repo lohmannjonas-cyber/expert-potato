@@ -8,8 +8,8 @@ export default async function MapPage() {
   return (
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-6">
-        <p className="text-sm font-black uppercase tracking-normal text-lagoon">Map view</p>
-        <h1 className="mt-1 text-3xl font-black text-slate-950">German kite spots</h1>
+        <p className="text-sm font-black uppercase tracking-normal text-lagoon">Kartenansicht</p>
+        <h1 className="mt-1 text-3xl font-black text-slate-950">Deutsche Kitespots</h1>
       </div>
       <section className="grid gap-5 lg:grid-cols-[1fr_340px]">
         <div className="min-h-[540px] rounded-lg border border-slate-200 bg-white p-2 shadow-soft">
@@ -20,7 +20,7 @@ export default async function MapPage() {
             <a key={spot.id} href={`/spots/${spot.slug}`} className="block rounded-lg border border-slate-200 bg-white p-4 shadow-soft hover:border-lagoon">
               <h2 className="font-black text-slate-950">{spot.name}</h2>
               <p className="mt-1 text-sm font-semibold text-slate-600">{regionLabel(spot.region, "de")}</p>
-              <p className="mt-2 text-sm text-slate-700">Good: {spot.suitableWindDirections.join(", ")}</p>
+              <p className="mt-2 text-sm text-slate-700">Gut: {spot.suitableWindDirections.join(", ")}</p>
             </a>
           ))}
         </aside>

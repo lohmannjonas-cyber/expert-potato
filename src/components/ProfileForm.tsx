@@ -34,7 +34,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       })
     });
 
-    setMessage(response.ok ? "Profile saved." : "Sign in first, then save preferences.");
+    setMessage(response.ok ? "Profil gespeichert." : "Bitte zuerst anmelden, dann Vorlieben speichern.");
   }
 
   return (
@@ -45,40 +45,44 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           <input name="name" defaultValue={profile?.name ?? ""} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
         </label>
         <label className="text-sm font-bold text-slate-700">
-          Skill level
+          Fahrlevel
           <select name="skillLevel" defaultValue={profile?.skillLevel ?? "INTERMEDIATE"} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2">
-            <option value="BEGINNER">Beginner</option>
-            <option value="INTERMEDIATE">Intermediate</option>
-            <option value="ADVANCED">Advanced</option>
+            <option value="BEGINNER">Einsteiger</option>
+            <option value="INTERMEDIATE">Fortgeschritten</option>
+            <option value="ADVANCED">Sehr erfahren</option>
           </select>
         </label>
         <label className="text-sm font-bold text-slate-700">
-          Home latitude
+          Heimatort Breitengrad
           <input name="homeLat" type="number" step="0.0001" defaultValue={profile?.homeLat ?? ""} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
         </label>
         <label className="text-sm font-bold text-slate-700">
-          Home longitude
+          Heimatort Laengengrad
           <input name="homeLon" type="number" step="0.0001" defaultValue={profile?.homeLon ?? ""} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
         </label>
         <label className="text-sm font-bold text-slate-700">
-          Preferred min wind
+          Bevorzugter Min. Wind
           <input name="preferredMinWind" type="number" defaultValue={profile?.preferredMinWind ?? 15} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
         </label>
         <label className="text-sm font-bold text-slate-700">
-          Preferred max wind
+          Bevorzugter Max. Wind
           <input name="preferredMaxWind" type="number" defaultValue={profile?.preferredMaxWind ?? 25} className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
         </label>
       </div>
       <div className="mt-4 flex flex-wrap gap-3 text-sm font-semibold text-slate-700">
-        {["flat", "chop", "wave"].map((type) => (
+        {[
+          ["flat", "Flachwasser"],
+          ["chop", "Kabbelwasser"],
+          ["wave", "Welle"]
+        ].map(([type, label]) => (
           <label key={type} className="flex items-center gap-2 rounded-md bg-slate-50 px-3 py-2 capitalize">
-            <input name={type} type="checkbox" defaultChecked={profile?.preferredSpotTypes.includes(type)} /> {type}
+            <input name={type} type="checkbox" defaultChecked={profile?.preferredSpotTypes.includes(type)} /> {label}
           </label>
         ))}
       </div>
       <div className="mt-4 flex items-center justify-between gap-3">
         <p className="text-sm font-semibold text-slate-600">{message}</p>
-        <button className="focus-ring rounded-md bg-lagoon px-5 py-2 font-black text-white hover:bg-current">Save profile</button>
+        <button className="focus-ring rounded-md bg-lagoon px-5 py-2 font-black text-white hover:bg-current">Profil speichern</button>
       </div>
     </form>
   );

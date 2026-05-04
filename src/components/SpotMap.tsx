@@ -49,7 +49,7 @@ export function SpotMap({ spots }: { spots: KiteSpotInput[] }) {
         const href = `/spots/${encodeURIComponent(spot.slug)}`;
         L.marker([spot.latitude, spot.longitude], { icon })
           .addTo(map)
-          .bindPopup(`<strong>${name}</strong><br/>${region}<br/>Best: ${good}<br/>Unsafe: ${unsafe}<br/><a href="${href}">Open spot</a>`);
+          .bindPopup(`<strong>${name}</strong><br/>${region}<br/>Gut: ${good}<br/>Unsicher: ${unsafe}<br/><a href="${href}">Spot oeffnen</a>`);
       }
 
       cleanup = () => map.remove();

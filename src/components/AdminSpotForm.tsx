@@ -47,14 +47,14 @@ export function AdminSpotForm() {
       body: JSON.stringify(payload)
     });
 
-    setMessage(response.ok ? "Spot created." : "Admin sign-in is required to save changes.");
+    setMessage(response.ok ? "Spot erstellt." : "Admin-Anmeldung ist zum Speichern erforderlich.");
   }
 
   return (
     <form action={submit} className="rounded-lg border border-slate-200 bg-white p-5 shadow-soft">
       <div className="grid gap-3 md:grid-cols-3">
         <label className="text-sm font-bold text-slate-700">
-          Spot name
+          Spotname
           <input name="name" required placeholder="Fehmarn Gold" className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
         </label>
         <label className="text-sm font-bold text-slate-700">
@@ -71,73 +71,73 @@ export function AdminSpotForm() {
           </select>
         </label>
         <label className="text-sm font-bold text-slate-700">
-          Latitude
+          Breitengrad
           <input name="latitude" required type="number" step="0.0001" placeholder="54.4112" className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
         </label>
         <label className="text-sm font-bold text-slate-700">
-          Longitude
+          Laengengrad
           <input name="longitude" required type="number" step="0.0001" placeholder="11.0497" className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
         </label>
         <label className="text-sm font-bold text-slate-700">
-          Water type
+          Wassertyp
           <input name="spotTypes" placeholder="flat, chop" className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
         </label>
         <label className="text-sm font-bold text-slate-700">
-          Good wind directions
+          Gute Windrichtungen
           <input name="suitableWindDirections" placeholder="SW, WSW, W" className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
         </label>
         <label className="text-sm font-bold text-slate-700">
-          Offshore directions
+          Offshore-Richtungen
           <input name="offshoreWindDirections" placeholder="E, ENE, NE" className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
         </label>
         <label className="text-sm font-bold text-slate-700">
-          Thermal potential, 0-3
+          Thermikpotenzial, 0-3
           <input name="thermalPotential" type="number" min="0" max="3" defaultValue="1" className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
         </label>
         <label className="text-sm font-bold text-slate-700">
-          Ideal min wind, knots
+          Idealer Min. Wind, Knoten
           <input name="idealMinWindKnots" type="number" defaultValue="15" className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
         </label>
         <label className="text-sm font-bold text-slate-700">
-          Ideal max wind, knots
+          Idealer Max. Wind, Knoten
           <input name="idealMaxWindKnots" type="number" defaultValue="25" className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
         </label>
         <label className="text-sm font-bold text-slate-700">
-          Parking info
+          Parkinfos
           <input name="parkingInfo" placeholder="Paid lot near launch" className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
         </label>
         <label className="text-sm font-bold text-slate-700">
-          Water depth
+          Wassertiefe
           <input name="waterDepth" placeholder="Large standing area" className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
         </label>
         <label className="text-sm font-bold text-slate-700">
-          Season restrictions
-          <input name="seasonRestrictions" placeholder="Respect summer bathing zones" className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
+          Saisonregeln
+          <input name="seasonRestrictions" placeholder="Badezonen im Sommer beachten" className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
         </label>
         <label className="text-sm font-bold text-slate-700">
-          Danger notes
-          <input name="dangerNotes" placeholder="Notes separated by ;" className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
+          Gefahrenhinweise
+          <input name="dangerNotes" placeholder="Hinweise mit ; trennen" className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
         </label>
       </div>
       <label className="mt-3 block text-sm font-bold text-slate-700">
-        Admin notes
-        <textarea name="adminNotes" placeholder="Internal notes for this spot" className="mt-1 min-h-24 w-full rounded-md border border-slate-300 px-3 py-2" />
+        Admin-Notizen
+        <textarea name="adminNotes" placeholder="Interne Notizen fuer diesen Spot" className="mt-1 min-h-24 w-full rounded-md border border-slate-300 px-3 py-2" />
       </label>
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-3 text-sm font-semibold text-slate-700">
           <label className="flex items-center gap-2 rounded-md bg-slate-50 px-3 py-2">
-            <input name="beginnerFriendly" type="checkbox" /> Beginner friendly
+            <input name="beginnerFriendly" type="checkbox" /> Einsteigerfreundlich
           </label>
           <label className="flex items-center gap-2 rounded-md bg-slate-50 px-3 py-2">
             <input name="tideRelevant" type="checkbox" /> Tide relevant
           </label>
           <label className="flex items-center gap-2 rounded-md bg-slate-50 px-3 py-2">
-            <input name="restricted" type="checkbox" /> Restricted
+            <input name="restricted" type="checkbox" /> Eingeschraenkt
           </label>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-sm font-semibold text-slate-600">{message}</span>
-          <button className="focus-ring rounded-md bg-lagoon px-5 py-2 font-black text-white hover:bg-current">Add spot</button>
+          <button className="focus-ring rounded-md bg-lagoon px-5 py-2 font-black text-white hover:bg-current">Spot hinzufuegen</button>
         </div>
       </div>
     </form>

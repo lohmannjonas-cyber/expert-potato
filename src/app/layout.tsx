@@ -8,17 +8,17 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "KiteSpot Radar Germany",
-  description: "Rank German kitesurfing spots by interpreted wind, weather, safety, and rider preferences."
+  description: "Deutsche Kitespots nach Wind, Wetter, Sicherheit und Fahrervorlieben bewerten."
 };
 
 const navigation = [
   { href: "/", label: "Dashboard", icon: Gauge },
-  { href: "/rankings", label: "Rankings", icon: SlidersHorizontal },
+  { href: "/rankings", label: "Rangliste", icon: SlidersHorizontal },
   { href: "/map", label: "Karte", icon: Map },
   { href: "/calendar", label: "Kalender", icon: CalendarDays },
-  { href: "/alerts", label: "Alerts", icon: Bell },
+  { href: "/alerts", label: "Alarme", icon: Bell },
   { href: "/profile", label: "Profil", icon: User },
-  { href: "/admin/spots", label: "Admin", icon: ShieldCheck }
+  { href: "/admin/spots", label: "Verwaltung", icon: ShieldCheck }
 ];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

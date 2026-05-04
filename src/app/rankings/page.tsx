@@ -1,4 +1,5 @@
 import { addDays, format } from "date-fns";
+import { de } from "date-fns/locale";
 import { FilterBar } from "@/components/FilterBar";
 import { RatingCard } from "@/components/RatingCard";
 import { getRankingsForDate } from "@/lib/rankings";
@@ -18,10 +19,12 @@ export default async function RankingsPage({ searchParams }: { searchParams: Pro
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-black uppercase tracking-normal text-lagoon">Spot ranking</p>
-          <h1 className="mt-1 text-3xl font-black text-slate-950">Best kite windows for {format(date, "EEEE, dd MMM")}</h1>
+          <p className="text-sm font-black uppercase tracking-normal text-lagoon">{locale === "de" ? "Spot-Rangliste" : "Spot ranking"}</p>
+          <h1 className="mt-1 text-3xl font-black text-slate-950">
+            {locale === "de" ? "Beste Kite-Fenster fuer" : "Best kite windows for"} {format(date, "EEEE, dd MMM", locale === "de" ? { locale: de } : undefined)}
+          </h1>
         </div>
-        <p className="text-sm font-bold text-slate-600">{rankings.length} spots matched</p>
+        <p className="text-sm font-bold text-slate-600">{rankings.length} {locale === "de" ? "Spots gefunden" : "spots matched"}</p>
       </div>
 
       <FilterBar

@@ -17,7 +17,7 @@ export function LoginForm() {
     });
 
     if (result?.error) {
-      setError("The email or password did not match.");
+      setError("E-Mail oder Passwort passt nicht.");
       return;
     }
 
@@ -28,15 +28,15 @@ export function LoginForm() {
   return (
     <form action={onSubmit} className="space-y-4 rounded-lg border border-slate-200 bg-white p-6 shadow-soft">
       <label className="block text-sm font-bold text-slate-700">
-        Email
+        E-Mail
         <input name="email" type="email" required className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
       </label>
       <label className="block text-sm font-bold text-slate-700">
-        Password
+        Passwort
         <input name="password" type="password" required className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
       </label>
       {error ? <p className="rounded-md bg-orange-50 px-3 py-2 text-sm font-semibold text-orange-800">{error}</p> : null}
-      <button className="focus-ring w-full rounded-md bg-lagoon px-4 py-2 font-black text-white hover:bg-current">Sign in</button>
+      <button className="focus-ring w-full rounded-md bg-lagoon px-4 py-2 font-black text-white hover:bg-current">Anmelden</button>
     </form>
   );
 }
@@ -59,7 +59,7 @@ export function SignupForm() {
     });
 
     if (!response.ok) {
-      setError("Could not create that account.");
+      setError("Konto konnte nicht erstellt werden.");
       return;
     }
 
@@ -79,23 +79,23 @@ export function SignupForm() {
         <input name="name" type="text" className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
       </label>
       <label className="block text-sm font-bold text-slate-700">
-        Email
+        E-Mail
         <input name="email" type="email" required className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
       </label>
       <label className="block text-sm font-bold text-slate-700">
-        Skill level
+        Fahrlevel
         <select name="skillLevel" defaultValue="INTERMEDIATE" className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2">
-          <option value="BEGINNER">Beginner</option>
-          <option value="INTERMEDIATE">Intermediate</option>
-          <option value="ADVANCED">Advanced</option>
+          <option value="BEGINNER">Einsteiger</option>
+          <option value="INTERMEDIATE">Fortgeschritten</option>
+          <option value="ADVANCED">Sehr erfahren</option>
         </select>
       </label>
       <label className="block text-sm font-bold text-slate-700">
-        Password
+        Passwort
         <input name="password" type="password" minLength={8} required className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2" />
       </label>
       {error ? <p className="rounded-md bg-orange-50 px-3 py-2 text-sm font-semibold text-orange-800">{error}</p> : null}
-      <button className="focus-ring w-full rounded-md bg-lagoon px-4 py-2 font-black text-white hover:bg-current">Create account</button>
+      <button className="focus-ring w-full rounded-md bg-lagoon px-4 py-2 font-black text-white hover:bg-current">Konto erstellen</button>
     </form>
   );
 }

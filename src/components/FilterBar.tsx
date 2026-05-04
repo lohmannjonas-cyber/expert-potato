@@ -159,7 +159,7 @@ export function FilterBar({
 
       {hideSubmit ? null : (
         <div className="mt-4 flex items-center justify-end gap-3">
-          {autoSubmit ? <span className="text-sm font-bold text-slate-500">Applies automatically</span> : null}
+          {autoSubmit ? <span className="text-sm font-bold text-slate-500">{locale === "de" ? "Wird automatisch angewendet" : "Applies automatically"}</span> : null}
           <button className="focus-ring rounded-md bg-lagoon px-5 py-2 font-black text-white hover:bg-current">
             {submitLabel}
           </button>
