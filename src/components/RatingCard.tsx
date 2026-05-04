@@ -36,7 +36,7 @@ function DirectionArrow({ degrees }: { degrees: number }) {
     <svg
       viewBox="0 0 24 24"
       aria-hidden="true"
-      className="h-5 w-5 text-lagoon"
+      className="h-4 w-4 text-lagoon"
       style={{
         transform: `rotate(${Number.isFinite(degrees) ? degrees : 0}deg)`,
         transformOrigin: "50% 50%"
@@ -75,11 +75,11 @@ export function RatingCard({ rating, rank, locale = "de" }: { rating: SpotRating
           <Wind size={16} />
           {wind} {windLabel}
         </span>
-        <span className="flex items-center gap-2 rounded-md bg-slate-50 px-3 py-2 font-semibold text-slate-700 ring-1 ring-slate-200">
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white ring-1 ring-slate-200">
+        <span className="flex min-w-0 items-center justify-center gap-1.5 rounded-md bg-slate-50 px-2 py-2 font-semibold text-slate-700 ring-1 ring-slate-200">
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white ring-1 ring-slate-200">
             <DirectionArrow degrees={directionDegrees} />
           </span>
-          {rating.meta.dominantDirection}
+          <span className="min-w-0 text-center text-sm leading-none">{rating.meta.dominantDirection}</span>
         </span>
         <span className={metricClass(temperatureTone(temp))} title="Temperature: blue cold, green comfortable, yellow warm">
           <ThermometerSun size={16} />
